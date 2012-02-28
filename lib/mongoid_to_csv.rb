@@ -5,7 +5,17 @@ module MongoidToCSV
   # Return full CSV content with headers as string.
   # Defined as class method which will have chained scopes applied.
   def to_csv
-    csv_columns = fields.keys - %w{_id created_at updated_at _type}
+    csv_columns = fields.keys - %w{_type}
+    fields_options = criteria.options[:fields]
+    unless fields_options.nil?
+      # Only check if the first field is a inclusion or exclusion, because mongoid spec
+      # states only and without cannot be used together 
+      if fields_options.values[0] == 1
+        csv_columns &= fields_options.keys.collect{|x| x.to_s}
+      else
+        csv_columns -= fields_options.keys.collect{|x| x.to_s}
+      end
+    end
     header_row = csv_columns.to_csv
     records_rows = all.map do |record|
       csv_columns.map do |column|
