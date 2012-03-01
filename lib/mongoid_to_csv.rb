@@ -11,7 +11,7 @@ module MongoidToCSV
       # Only check if the first field is a inclusion or exclusion, because mongoid spec
       # states only and without cannot be used together 
       if fields_options.values[0] == 1
-        csv_columns &= fields_options.keys.collect{|x| x.to_s}
+        csv_columns = fields_options.keys.collect{|x| x.to_s}  - %w{_type}
       else
         csv_columns -= fields_options.keys.collect{|x| x.to_s}
       end
@@ -19,7 +19,7 @@ module MongoidToCSV
     header_row = csv_columns.to_csv
     records_rows = all.map do |record|
       csv_columns.map do |column|
-        value = record.send(column)
+        value = record[column]
         value = value.to_csv if value.respond_to?(:to_csv)
         value
       end.to_csv
