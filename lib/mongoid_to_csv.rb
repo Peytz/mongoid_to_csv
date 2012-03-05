@@ -19,7 +19,10 @@ module MongoidToCSV
     header_row = csv_columns.to_csv
     records_rows = all.map do |record|
       csv_columns.map do |column|
-        value = record[column]
+        value = case column
+          when /\./ then record[column.split('.').first][0][column.split('.').second]
+          else record[column]
+        end
         value = value.to_csv if value.respond_to?(:to_csv)
         value
       end.to_csv
