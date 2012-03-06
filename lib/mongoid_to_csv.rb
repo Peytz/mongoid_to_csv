@@ -16,16 +16,24 @@ module MongoidToCSV
         csv_columns -= fields_options.keys.collect{|x| x.to_s}
       end
     end
+
+    csv_columns.each { |col| @deep_column ||= col.split('.').first if col.include? '.' }
+    @deep_column ||= csv_columns.first
+
     header_row = csv_columns.to_csv
     records_rows = all.map do |record|
-      csv_columns.map do |column|
-        value = case column
-          when /\./ then record[column.split('.').first][0][column.split('.').second]
-          else record[column]
-        end
-        value = value.to_csv if value.respond_to?(:to_csv)
-        value
-      end.to_csv
+      sub_rows = Array.new
+      1.upto(record[@deep_column].kind_of?(Array) ? record[@deep_column].count : 1) do |i|
+        sub_rows << csv_columns.map do |column|
+          value = case column
+            when /\./ then record[column.split('.').first][i-1][column.split('.').second]
+            else record[column]
+          end
+          value = value.to_csv if value.respond_to?(:to_csv)
+          value
+        end.to_csv
+      end
+      sub_rows
     end.join
     header_row + records_rows
   end
