@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'mongoid', '>= 2.0.0.rc.7'
+  s.add_dependency 'mongoid', '~> 3.0'
 
   s.add_development_dependency 'rspec', '2.6.0'
   s.add_development_dependency 'mongo', '>= 1.3.1'
